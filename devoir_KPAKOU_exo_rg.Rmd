@@ -1,0 +1,119 @@
+---
+title: "EXERCICE2"
+author: "kpakou"
+date: "2023-04-26"
+output: 
+ pdf_document:
+    latex_engine: xelatex
+    highlight: zenburn
+    
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,warning = FALSE,eval=TRUE,comment="",fig.width=40)
+df_KPAKOU<-read.csv2("E:\\KPAM ISEP 2\\Semestre 4\\Programmation R\\Cours R 2023\\EXERCICES\\df.KPAKOU.csv")
+
+
+```
+`warming` permet de ne pas afficher les messages d'erreurs  
+`eval=TRUE` affiche les resultats   
+
+**analyse pour une variable quantitative**  
+
+
+```{r }
+d.var.quant<-function(var){
+  moyenne <- mean(var)#moyenne
+  mediane <- median(var)#mediane
+  mode <- names(sort(-table(var)))[1]
+  cat(paste("La moyenne  est :", moyenne, "\n"))
+  cat(paste("La médiane est :", mediane, "\n"))
+  cat(paste("Le mode est :", mode, "\n"))
+  #intervalle de confiance
+  conf_intervale <- t.test(var)$conf.int
+  cat(paste("L'intervalle de confiance à 95% est :", conf_intervale[1], "-", conf_intervale[2], "\n"))
+  #Histogramme
+ hist(var,main="Hsitogramme ")
+
+ #boxplot
+ boxplot(var,main="boxplot ")
+ #diagramme en batons
+ plot(table(var),main="Diagramme en batons",type="h")
+}
+
+```
+
+**Analyse pour une variable qualitative**
+
+```{r echo=T}
+
+d.var.qualit<-function(df_KPAKOU,var){
+   # Tendances centrales
+  mode <- names(sort(-table(df_KPAKOU[[var]])))[1]
+
+  cat(paste0("Mode: ", mode, "\n\n"))
+  #Diagramme en barre
+  barplot(table(df_KPAKOU$var), main="Diagramme en barres")
+  #diagramme circulaire
+pie(table(df_KPAKOU$var), main="Diagramme circulaire")
+#histogramme
+hist(df_KPAKOU$var, main="Histogramme ")
+#boxplot
+boxplot(df_KPAKOU$var, main="boxplot ")
+}
+```
+
+**Application pour les variables quantitatives**
+
+```{r eval=TRUE}
+apply(df_KPAKOU[,1:5],2,d.var.quant)
+
+```
+**Application pour les variables qualitatives**
+
+**Etude de l'indépendances des variables quantitatives**  
+
+*Test de correlation de pearson entre Taille et poids*
+
+```{r eval=TRUE}
+cor.test(df_KPAKOU$Age,df_KPAKOU$Taille,method=c("pearson", "kendall", "spearman"))
+```
+Le coefficient de correlation est faible(-0.109973) et la p-value superieur à 0.05  donc le test de pearson  n'est signifiactif
+*Test de spearman*
+
+```{r eval=F}
+cor.test(df_KPAKOU$Age,df_KPAKOU$Taille,method="spearman")
+```
+
+De meme le test de spearman n'est pas significatif  
+*Nuage des points*  
+```{r eval=T}
+plot(df_KPAKOU$Age,df_KPAKOU$Taille, pch = 19, col = "blue", main = "Diagramme de dispersion des variables quantitatives", xlab = "df_KPAKOU$Age", ylab = "df_KPAKOU$Taille")
+
+# Ajouter une droite de régression
+abline(lm(df_KPAKOU$Taille ~df_KPAKOU$Age), col = "red")
+```
+
+# *Etude de correlation entre deux variables qualitatives*
+**Test de chi2**
+```{r eval=T}
+chisq.test(df_KPAKOU$Sexe,df_KPAKOU$Mention)
+```
+
+La p-value du test de chi 2 est inferieur à 0.05 donc on peut conclure qu'il y'a correlation entre le sexe et la mention.  
+
+# **Etude correlation entre une variable quantitative et une variable qualitative**  
+**Test t de student**
+
+```{r eval=T}
+t.test(df_KPAKOU$Age ~ df_KPAKOU$Sexe)
+```
+ 
+La  $p-value = 0.7172>0.05$ ,le test de t-Student n'est pas significatif  
+**BOXPLOT**
+
+```{r eval=F}
+boxplot(df_KPAKOU$Age ~ df_KPAKOU$Sexe)
+```
+
+

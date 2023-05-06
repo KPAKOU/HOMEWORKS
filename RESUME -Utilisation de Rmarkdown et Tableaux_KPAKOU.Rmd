@@ -1,0 +1,156 @@
+---
+title: "Resume Rmarkdown"
+author: "KPAM"
+date: "2023-05-05"
+output:
+  pdf_document:
+    df_print: kable
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,eval=T)
+```
+
+#Rmarkdown basiques
+
+Pour mettre en gras un mot on le met en **__**
+Pour mettre en italique un mot on le met en **__**
+-les titres et sous titres
+Pour mettre les titres on met #(Titre)
+Pour mettre les sous titres de niveau2 ##(sous-titre)
+
+-Pour inserer des chuncks
+```{r}
+#on ecrit le code ici
+```
+-insertion des liens
+[linked phrase](lien)
+-insertion des images
+![optional caption text](chemin accès à l'image)
+-insertion des citation
+>citation
+
+-equation latex (mettre l'equation entre deux $ )
+$ equation$
+-tracer une ligne horizontale
+---------------------------
+-Tableau
+entete 1  | entete 2
+----------| -----------
+cell1     | Cell2
+Cell3     | Cell4
+
+
+#Gestion des tableaux statistiques   
+
+-Pour ajouter des tableaux ,on ajoute à l'entete une option df_print:kable
+-installation des packages kable et kableExtra  
+```{r eval=F}
+install.packages("kableExtra")
+# Chargement des libraries
+library(knitr)
+library(kableExtra)
+```
+Nous utiliserons les jeux de données iris,et mtcars
+
+##LA FONCTION KABLE() POUR UN AFFICHAGE DE TABLEAUX SIMPLES ET EFFICACES
+
+```{r}
+library(kableExtra)
+library(dplyr)
+head(iris)%>%
+  kable(format = "latex")
+```
+-le paramètre booktable à TRUE, le résultat est un peu plus satisfaisant  
+-Il est également possible d’ajouter un titre numéroté à notre table, grâce au paramètre caption de la fonction kable()  
+
+```{r eval=T}
+library(kableExtra)
+head(iris) %>%
+  kable(format = "latex", booktabs = TRUE, caption = "Ma table")
+
+```
+
+##Application des styles
+-la fonction kable_styling() du package {kableExtra} permet de styliser un peu notre table, comme par exemple via le paramètre latex_options :
+```{r}
+head(iris) %>%
+  kable("latex", booktabs = T)%>%
+  kable_styling(latex_options = "striped")
+
+```
+
+-Avec l'option LaTeX HOLD_position, je peux ajouter un titre à ma table et faire en sorte qu’elle reste à l’endroit exact où je l’ai créée 
+```{r}
+head(iris) %>%
+  kable("latex", booktabs = T, caption = "Ma table")%>%
+  kable_styling(latex_options = c("striped", "HOLD_position"))
+
+```
+
+-l’option scale_down qui va permettre un ajustement de la table à la taille de la page.
+-Dans le cas où la table à afficher contient trop de lignes pour être contenue dans une seule page, on peut répéter les noms de colonnes à chaque page, via l’option repeat_header et le paramètre longtable   
+##DES COLONNES ET DES LIGNES STYLÉES, EN COULEUR, ITALIQUE, GRAS
+-la fonction column_spec permet de spécifier le style d’une ou plusieurs colonnes 
+
+-la fonction row_spec permet de spécifier le style d’une ou plusieurs lignes
+
+
+##COMPLEXIFIER LA STRUCTURE AVEC DE MULTIPLES EN-TÊTE ET DES CELLULES FUSIONNÉES
+- L'option add_header_above() permet de grouper les colonnes et d’ajouter une seconde ligne contenant le nom des groupes  
+Par exemple
+```{r}
+head(iris) %>%
+  kable("latex", booktabs = TRUE) %>%
+  kable_styling(latex_options = "striped") %>%
+  add_header_above(c("Sepal" = 2, "Petal" = 2, " " = 1), italic = TRUE)
+
+```
+- l'option pack_rows() permet de grouper les lignes 
+
+##AJOUT DE NOTES DE BAS DE TABLEAU
+
+On peut également **ajouter des notes en bas du tableau*, via la fonction footnote()  
+Exemple
+```{r}
+head(iris) %>%
+  kable("latex",  booktabs = TRUE) %>%
+  footnote(general = "Commentaire général de la table",
+           number = c("note 1; ", "note 2; "),
+           alphabet = c("note A; ", "note B; "),
+           symbol = c("symbole 1; ", "symbole 2"),
+           title_format = c("italic", "underline"))
+
+
+```
+
+Le package {gt} pour formater vos tableaux
+{gt}, pour great table. C’est un package relativement récent, puissant et simple d’utilisation. La fonction de base, gt(), appelée sans paramètres autres que le jeu de données, nous donne le même rendu que la fonction kable() du package {knitr} 
+```{r}
+library(gt)
+head(iris) %>%
+  gt()
+```
+
+##COMPLEXIFIER LA STRUCTURE AVEC DES TITRES, DES GROUPES DE COLONNES ET DE LIGNES
+De manière similaire à la fonction add_header_above() du package {kableExtra}, il est possible de créer des groupes de colonnes, via la fonction tab_spanner() :
+```{r}
+head(iris) %>%
+  gt() %>%
+  tab_spanner(label = "Sepal", columns = c(1, 2)) %>%
+  tab_spanner(label = "Petal", columns = c(3, 4))
+
+```
+Comme avec {kableExtra} et sa fonction pack_rows(), on peut ici créer des groupes de lignes, grâce à la fonction tab_row_group() :
+```{r}
+mtcars[1:10, 1:6] %>%
+  mutate(name = rownames(.)) %>%
+  gt(rowname_col = "name") %>%
+  tab_stubhead(label = "Car name") %>%
+  tab_row_group(group = "Group 2", rows = 8:10) %>%
+  tab_row_group(group = "Group 1", rows = 4:7) %>%
+  tab_row_group(group = " ", rows = 1:3)
+
+```
+
+#Reference
+THINKR,<<https://thinkr.fr/les-tableaux-statiques-pour-vos-rapports-en-r/>>
